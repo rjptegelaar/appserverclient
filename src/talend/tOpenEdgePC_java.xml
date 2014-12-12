@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<COMPONENT> 
+  <HEADER AUTHOR="Talend" COMPATIBILITY="ALL" DATA_AUTO_PROPAGATE="false" PLATEFORM="ALL" RELEASE_DATE="20080229A" SERIAL="" STARTABLE="false" STATUS="ALPHA" VERSION="0.102"> 
+    <SIGNATURE/> 
+  </HEADER>  
+  <FAMILIES> 
+    <FAMILY>Progress/OpenEdge</FAMILY> 
+  </FAMILIES>  
+  <DOCUMENTATION> 
+    <URL/> 
+  </DOCUMENTATION>  
+  <CONNECTORS> 
+    <CONNECTOR CTYPE="FLOW" MAX_INPUT="1"/> 
+  </CONNECTORS>  
+  <PARAMETERS> 
+    <PARAMETER FIELD="TEXT" NAME="appserverUrl" NUM_ROW="10" REQUIRED="true">
+		 <DEFAULT>"AppServer://localhost:5162/esbbroker1"</DEFAULT>
+	</PARAMETER>
+	<PARAMETER FIELD="TEXT" NAME="username" NUM_ROW="20" REQUIRED="true">
+		 <DEFAULT>"user1"</DEFAULT>
+	</PARAMETER>
+	<PARAMETER FIELD="PASSWORD" NAME="password" NUM_ROW="30" REQUIRED="true">
+		 <DEFAULT>""</DEFAULT>	
+	</PARAMETER>
+	<PARAMETER FIELD="TEXT" NAME="service" NUM_ROW="40" REQUIRED="false"/>
+	<PARAMETER NAME="session" FIELD="CLOSED_LIST" NUM_ROW="50">
+    	<ITEMS DEFAULT="SessionFree">
+	            <ITEM NAME="SessionManaged" VALUE="0"/>
+	            <ITEM NAME="SessionFree" VALUE="1"/>
+	          </ITEMS>
+    </PARAMETER>
+	<PARAMETER NAME="openEdgeJars" FIELD="TABLE" NUM_ROW="60" 
+                        NB_LINES="3" REQUIRED="true"> 
+	    <ITEMS> 
+	            <ITEM NAME="jarName" FIELD="MODULE_LIST" /> 
+	    </ITEMS> 
+    </PARAMETER> 
+   	<PARAMETER NAME="SCHEMA" FIELD="SCHEMA_TYPE" NUM_ROW="65"/>
+   	<PARAMETER FIELD="TEXT" NAME="procedureName" NUM_ROW="67" REQUIRED="true">
+		 <DEFAULT>"test.p"</DEFAULT>
+	</PARAMETER>
+    <PARAMETER NAME="procedureArguments"
+      FIELD="TABLE"
+      REQUIRED="true"
+      NUM_ROW="70"
+      NB_LINES="3"
+    >
+      <ITEMS>
+        <ITEM NAME="COLUMN" FIELD="COLUMN_LIST"/>
+
+        <ITEM NAME="TYPE" FIELD="CLOSED_LIST">
+          <ITEMS DEFAULT="IN">
+            <ITEM NAME="IN" VALUE="IN"/>
+            <ITEM NAME="OUT" VALUE="OUT"/>
+            <ITEM NAME="INOUT" VALUE="INOUT"/>
+          </ITEMS>
+        </ITEM>
+         <ITEM NAME="DBTYPE" FIELD="CLOSED_LIST" >
+	         <ITEMS DEFAULT="STRING">
+	            <ITEM VALUE="BOOLEAN" NAME="LOGICAL"/>
+	            <ITEM VALUE="DATE" NAME="DATE"/>
+	            <ITEM VALUE="DECIMAL" NAME="DECIMAL"/>
+	          	<ITEM VALUE="INT" NAME="INTEGER"/>
+	            <ITEM VALUE="LONG" NAME="INT64"/>
+	            <ITEM VALUE="STRING" NAME="CHARACTER"/>
+	            <ITEM VALUE="CLOB" NAME="LONGCHAR"/>
+	            <ITEM VALUE="BLOB" NAME="MEMPTR"/>
+	            <ITEM VALUE="DATETIME" NAME="DATETIME"/>
+	            <ITEM VALUE="DATETIMETZ" NAME="DATETIME-TZ"/>
+	          </ITEMS>
+         </ITEM>
+      </ITEMS>
+    </PARAMETER>			
+  </PARAMETERS>  
+  <ADVANCED_PARAMETERS>
+    <PARAMETER FIELD="LABEL" NAME="appServerInfoLabel" NUM_ROW="10">
+    	<DEFAULT>Info required by the application service at connection time</DEFAULT>
+    </PARAMETER>       
+    <PARAMETER FIELD="TEXT" NAME="appServerInfo" NUM_ROW="20" REQUIRED="false"/>
+  </ADVANCED_PARAMETERS>  
+    <CODEGENERATION>
+  	<IMPORTS>
+      	<IMPORT MODULE="appserverclient.jar" NAME="appserverclient" REQUIRED="true"/>     	                  
+    </IMPORTS>
+ </CODEGENERATION>
+  <RETURNS> 
+    <RETURN AVAILABILITY="AFTER" NAME="NB_LINE" TYPE="id_Integer"/> 
+  </RETURNS> 
+</COMPONENT>
