@@ -13,17 +13,19 @@
 //limitations under the License.
 package nl.progaia.progress.client;
 
-import nl.progaia.progress.exception.AppserverClientException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import nl.progaia.progress.exception.AppserverClientException;
 
 import com.progress.open4gl.javaproxy.Connection;
 import com.progress.open4gl.javaproxy.OpenAppObject;
 import com.progress.open4gl.javaproxy.ParamArray;
 
 public class AppserverClient {
-	private static final Logger logger = LoggerFactory.getLogger(AppserverClient.class);
+	private static final Logger logger = Logger.getAnonymousLogger();
 	
 	private String appserverUrl;
 	private String username;
@@ -62,8 +64,8 @@ public class AppserverClient {
 			try {
 				disconnect();
 			} catch (Exception e) {
-				logger.warn(e.getMessage());
-				if(logger.isDebugEnabled())
+				logger.warning(e.getMessage());
+				if(logger.isLoggable(Level.FINE))
 					e.printStackTrace();
 			} 
 		}
@@ -78,7 +80,7 @@ public class AppserverClient {
 			connection.setSessionModel(session);
 			openAppObject = new OpenAppObject(connection, service);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.severe(e.getMessage());
 			throw new AppserverClientException(e);
 		}
 	}	
@@ -97,7 +99,7 @@ public class AppserverClient {
 				connection = null;
 			}
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.warning(e.getMessage());
 			throw new AppserverClientException(e);
 		}
 	}	

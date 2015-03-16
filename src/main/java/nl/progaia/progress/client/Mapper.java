@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import nl.progaia.progress.exception.AppserverClientException;
 import nl.progaia.progress.valueholder.DateHolder;
@@ -28,9 +29,6 @@ import nl.progaia.progress.valueholder.MemptrHolder;
 import nl.progaia.progress.valueholder.StringHolder;
 import nl.progaia.progress.valueholder.ValueHolder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.progress.open4gl.Memptr;
 import com.progress.open4gl.Open4GLException;
 import com.progress.open4gl.javaproxy.ParamArray;
@@ -38,7 +36,7 @@ import com.progress.open4gl.javaproxy.ParamArrayMode;
 
 public final class Mapper {
 
-	private static final Logger logger = LoggerFactory.getLogger(Mapper.class);
+	private static final Logger logger = Logger.getAnonymousLogger();
 	
 	public static Map<Integer, ValueHolder<?>> from(Procedure procedure, ParamArray paramArray) throws AppserverClientException{
 		try {
@@ -194,7 +192,7 @@ public final class Mapper {
 						return null;
 
 					default:
-						logger.warn("No mapping for: " + type);
+						logger.warning("No mapping for: " + type);
 						return null;											
 					}
 	}

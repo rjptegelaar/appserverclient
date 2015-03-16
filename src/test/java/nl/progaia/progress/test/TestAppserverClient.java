@@ -15,6 +15,7 @@ package nl.progaia.progress.test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import nl.progaia.progress.client.AppserverClient;
 import nl.progaia.progress.client.Mapper;
@@ -27,14 +28,12 @@ import nl.progaia.progress.valueholder.ValueHolder;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.progress.open4gl.javaproxy.ParamArray;
 
 public class TestAppserverClient {
 
-	private static final Logger logger = LoggerFactory.getLogger(TestAppserverClient.class);
+	private static final Logger logger = Logger.getAnonymousLogger();
 	private AppserverClient ac;
 	private Procedure procedure;
 	
