@@ -46,8 +46,7 @@ public class TestAppserverClient {
 		procedure.addParameter(ParameterModeType.OUTPUT, ParameterType.STRING);
 		logger.info("Done init.");		
 	}
-	
-	@Test
+
 	public void testCall() throws AppserverClientException{
 		ValueHolder<String> inputHolder = new StringHolder("toch?");
 		ValueHolder<String> outputHolder = new StringHolder();
