@@ -10,11 +10,195 @@
 		org.talend.core.model.metadata.types.JavaTypesManager
 		org.talend.core.model.metadata.types.JavaType
 		java.util.List 
-    	java.util.Map		
-	" 
+    	java.util.Map
+    	java.util.Date    	   
+    	" 
 %>
 <% 
     CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
     INode node = (INode)codeGenArgument.getArgument();
     String cid = node.getUniqueName();	
+    List<Map<String, String>> procedureArguments = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__procedureArguments__");
+    String procedureName = ElementParameterParser.getValue(node, "__procedureName__");    
 %>
+        
+nl.progaia.progress.talend.utils.TalendProcedureMapping proc_<%=cid %> = new nl.progaia.progress.talend.utils.TalendProcedureMapping(<%=procedureName%>);
+
+<%
+
+// Search incoming schema
+IMetadataTable inMetadata = null;
+IMetadataTable outMetadata = null;
+IConnection inConnection = null;
+String inConnectionName = null;
+
+List<? extends IConnection> inConnections = node.getIncomingConnections();
+if (inConnections != null) {
+	for (int i = 0; i < inConnections.size(); i++) {
+		IConnection connection = inConnections.get(i);
+    	if (connection.getLineStyle().hasConnectionCategory(
+    			IConnectionCategory.DATA)) {
+		    inConnection = connection;
+		    inConnectionName = inConnection.getName();
+		    inMetadata = inConnection.getMetadataTable();
+    	}
+	}
+}
+
+// If there is an IN or an INOUT argument, the component must have an input
+// connection
+boolean canGenerate = true;
+if (inConnection == null) {
+	
+	for (int i = 0; i < procedureArguments.size(); i++) {
+		String argType = procedureArguments.get(i).get("TYPE");
+		if (("IN").equals(argType) || ("INOUT").equals(argType)) {
+			%>
+			// No code generated: IN or INOUT arguments defined, whereas <%=cid%> has no input
+			<%
+			canGenerate = false;
+			break;
+		}
+		
+		
+	}
+}
+
+IMetadataTable metadata = null;
+
+List<IMetadataTable> metadatas = node.getMetadataList();
+if (metadatas != null && metadatas.size() > 0) {
+    metadata = metadatas.get(0);
+}
+
+	// We only generate output if outgoing schema is defined
+	if ((metadatas != null) && (metadatas.size() > 0)) {
+		List<IMetadataColumn> columnList = metadata.getListColumns();
+		
+		// Iterate over procedure arguments
+		for (int i = 0; i < procedureArguments.size(); i++) {
+			Map<String, String> procedureArgument = procedureArguments.get(i);
+			String argName = procedureArgument.get("COLUMN");
+			String argType = procedureArgument.get("TYPE");
+			String argDBType = procedureArgument.get("DBTYPE");
+%>			
+			proc_<%=cid %>.addParameter(nl.progaia.progress.client.ParameterModeType.valueOf("<%=argType %>"), nl.progaia.progress.client.ParameterType.valueOf("<%=argDBType %>"), "<%=argName %>");			
+<%			
+		}
+		
+%>
+			//Create new TalendRow to fill with columns
+			nl.progaia.progress.talend.utils.TalendRow tr_<%=cid %> = new nl.progaia.progress.talend.utils.TalendRow();
+<%
+		
+		
+		if ((node.getIncomingConnections()!=null)&&(node.getIncomingConnections().size()>0)){
+			String inRowName = node.getIncomingConnections().get(0).getName();
+			if (inMetadata != null) {
+				List<IMetadataColumn> columns = inMetadata.getListColumns();
+				for (int i = 0; i < columns.size(); i++){
+					IMetadataColumn column = columns.get(i);
+					
+					//Store type for later use 
+					JavaType javaType = JavaTypesManager.getJavaTypeFromId(column.getTalendType());
+										
+					String typeToGenerate = JavaTypesManager.getTypeToGenerate(column.getTalendType(),true);
+					String pattern = column.getPattern();
+
+					if(pattern==null || "".equals(pattern)){
+	     				pattern="\"\"";
+	     			 }
+	     			Integer precisionValue = column.getPrecision();	     				 
+	     			Integer lengthValue = column.getLength();
+	     			String precision = "";
+	     			String length = "";
+
+					if(precisionValue!=null){
+						precision=String.valueOf(precisionValue);
+					}else{
+						precision="\"\"";
+					}
+					
+					if(lengthValue!=null){
+						length=String.valueOf(lengthValue);
+					}else{
+						length="\"\"";
+					}
+					
+					String label = column.getLabel();
+					
+					if(javaType == JavaTypesManager.DATE){
+					%>
+						Date tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%> = <%=inRowName%>.<%=column.getLabel()%>;
+						if(tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%>!=null){
+							tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",String.valueOf(tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%>.getTime()),"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");														
+						}else{
+							tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",null,"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");
+						}					
+					<%
+					}else if(javaType == JavaTypesManager.BYTE_ARRAY){
+					%>
+						tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",<%=inRowName%>.<%=column.getLabel()%>,"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");
+					<%
+					}else{
+					%>
+						tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",String.valueOf(<%=inRowName%>.<%=column.getLabel()%>),"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");					
+					<%
+					}
+					
+					
+				}
+			}
+		}
+%>
+		System.out.println(tr_<%=cid %>.toString());
+		System.out.println(proc_<%=cid %>.toString());
+		java.util.Map<Integer, nl.progaia.progress.valueholder.ValueHolder<?>> procedureResult_<%=cid %> = ac_<%=cid %>.callProcedure(proc_<%=cid %>.getValues(tr_<%=cid %>),proc_<%=cid %>.getProcedure());
+		proc_<%=cid %>.appendProcedureResult(procedureResult_<%=cid %>,tr_<%=cid %>);
+		
+<%		
+		List<? extends IConnection> outConnections = node.getOutgoingConnections();
+		IConnection firstOutConnection = null;
+		
+		if (outConnections != null) {
+			// Search first outgoing connection, if exists
+			int connectionIndex = -1;
+			for (int i = 0; i < outConnections.size(); i++) {
+				IConnection connection = outConnections.get(i);
+    			if (connection.getLineStyle().hasConnectionCategory(
+    					IConnectionCategory.DATA)) {
+					firstOutConnection = connection;
+					connectionIndex = i;
+					break;
+				}
+			}
+			
+			if (firstOutConnection != null) {
+				outMetadata = firstOutConnection.getMetadataTable();
+				List<IMetadataColumn> outColumnList = outMetadata.getListColumns();
+				
+				for (IMetadataColumn outColumn : outColumnList) {
+					String label = outColumn.getLabel();
+					String outTypeToGenerate = JavaTypesManager.getTypeToGenerate(outColumn.getTalendType(), outColumn.isNullable());
+%>
+					System.out.println("<%=label %>");
+					System.out.println("<%=outTypeToGenerate %>");
+					System.out.println(tr_<%=cid %>.getColumnByName("<%=label %>").toString());	
+<%				
+				
+				}
+			}
+		}
+		
+		
+%>		
+		
+<%		
+		
+	}
+
+
+%>
+
+
+

@@ -44,9 +44,11 @@ public class TestAppserverClient {
 		procedure = new Procedure("test.p");
 		procedure.addParameter(ParameterModeType.INPUT, ParameterType.STRING);
 		procedure.addParameter(ParameterModeType.OUTPUT, ParameterType.STRING);
-		logger.info("Done init.");		
+		logger.info("Done init.");
+		ParameterType.valueOf("test");
 	}
 
+	@Test
 	public void testCall() throws AppserverClientException{
 		ValueHolder<String> inputHolder = new StringHolder("toch?");
 		ValueHolder<String> outputHolder = new StringHolder();
@@ -56,6 +58,7 @@ public class TestAppserverClient {
 		ParamArray output = ac.callProcedure(Mapper.from(procedure, values),procedure);
 		Map<Integer, ValueHolder<?>> returnValues = Mapper.from(procedure, output);
 		System.out.println(((ValueHolder<String>)returnValues.get(1)).getValue());
+		
 	}
 
 }

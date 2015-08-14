@@ -58,44 +58,52 @@ public final class Mapper {
 			ParamArray paramArray = new ParamArray(procedure.size());
 			Map<Integer, Parameter> paramMap = procedure.getParameters();
 			Set<Integer> paramIndexSet = paramMap.keySet();
-			for (Integer index : paramIndexSet) {
-
-					switch(paramMap.get(index).getDataType()){
-						case BLOB:
-							paramArray.addMemptr(index.intValue(), (Memptr)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));	
-							break;
-						case BOOLEAN:								
-							paramArray.addLogical(index.intValue(), (Boolean)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case CLOB:
-							paramArray.addLongchar(index.intValue(), (String)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case DATE:
-							paramArray.addDate(index.intValue(), (GregorianCalendar)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case DATETIME:
-							paramArray.addDatetime(index.intValue(), (GregorianCalendar)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case DATETIMETZ:
-							paramArray.addDatetimeTZ(index.intValue(), (GregorianCalendar)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case DECIMAL:
-							paramArray.addDecimal(index.intValue(), (BigDecimal)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case INT:
-							paramArray.addInteger(index.intValue(), (Integer)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case LONG:
-							paramArray.addInt64(index.intValue(), (Long)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
-							break;
-						case STRING:
-							paramArray.addCharacter(index, (String)values.get(index).getValue(), from(paramMap.get(index).getInputOuputType()));
-							break;
-						default:
-							throw new AppserverClientException("Unsupported parameter type: " + paramMap.get(index).getDataType().name());
-					
+			if(values!=null && values.size()>0){
+				for (Integer index : paramIndexSet) {	
+					if(values.get(index)!=null){
+						switch(paramMap.get(index).getDataType()){
+							case BLOB:
+								paramArray.addMemptr(index.intValue(), (Memptr)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));	
+								break;
+							case BOOLEAN:								
+								paramArray.addLogical(index.intValue(), (Boolean)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case CLOB:
+								paramArray.addLongchar(index.intValue(), (String)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case DATE:
+								paramArray.addDate(index.intValue(), (GregorianCalendar)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case DATETIME:
+								paramArray.addDatetime(index.intValue(), (GregorianCalendar)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case DATETIMETZ:
+								paramArray.addDatetimeTZ(index.intValue(), (GregorianCalendar)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case DECIMAL:
+								paramArray.addDecimal(index.intValue(), (BigDecimal)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case INT:
+								paramArray.addInteger(index.intValue(), (Integer)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case LONG:
+								paramArray.addInt64(index.intValue(), (Long)values.get(index).getValue(),  from(paramMap.get(index).getInputOuputType()));
+								break;
+							case STRING:																																
+									paramArray.addCharacter(index, (String)values.get(index).getValue(), from(paramMap.get(index).getInputOuputType()));								
+								break;
+							default:
+								throw new AppserverClientException("Unsupported parameter type: " + paramMap.get(index).getDataType().name());						
+						}
+					}else{
+						paramArray.addCharacter(index, null, from(paramMap.get(index).getInputOuputType()));
 					}
+				}
+
+			}else{
+				logger.info("No values to map to valueholer.");
 			}
+		
 			
 			
 			return paramArray;
@@ -104,7 +112,7 @@ public final class Mapper {
 		}
 	}
 
-	private static ValueHolder<?> getValueHolder(ParameterType type, Object value) throws AppserverClientException{
+	public static ValueHolder<?> getValueHolder(ParameterType type, Object value) throws AppserverClientException{
 		
 		switch(type){
 					case STRING:

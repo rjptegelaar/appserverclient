@@ -17,4 +17,21 @@
     CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
     INode node = (INode)codeGenArgument.getArgument();
     String cid = node.getUniqueName();	
+    
+    String appserverUrl = ElementParameterParser.getValue(node, "__appserverUrl__");
+    String username = ElementParameterParser.getValue(node, "__username__");
+    String password = ElementParameterParser.getValue(node, "__password__");
+    String service = ElementParameterParser.getValue(node, "__service__");
+    int session = java.lang.Integer.parseInt(ElementParameterParser.getValue(node, "__session__"));
+    String procedureName = ElementParameterParser.getValue(node, "__procedureName__");
+    List<Map<String, String>> procedureArguments = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__procedureArguments__");
+    String appServerInfo = ElementParameterParser.getValue(node, "__appServerInfo__");
+    
+    
 %>
+
+nl.progaia.progress.client.AppserverClient ac_<%=cid %> = new nl.progaia.progress.client.AppserverClient(<%=appserverUrl%>, <%=username%>, <%=password%>, <%=service%>, <%=appServerInfo%>, <%=session%>);
+
+
+
+

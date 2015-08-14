@@ -1,4 +1,5 @@
 //Copyright 2014 Paul Tegelaar
+
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,6 +23,7 @@ public class Procedure {
 	
 	public Procedure(String name){
 		this.name = name;
+		parameters = new HashMap<Integer, Parameter>();
 	}
 	
 	public Map<Integer, Parameter> getParameters() {
@@ -44,11 +46,20 @@ public class Procedure {
 		this.name = name;
 	}
 	
-	public void addParameter(ParameterModeType inputOuputType, ParameterType dataType){		
-		if(parameters==null)
-			parameters = new HashMap<Integer, Parameter>();
-		
-		parameters.put(parameters.size(), new Parameter(inputOuputType, dataType));
+	public int addParameter(ParameterModeType inputOuputType, ParameterType dataType){		
+					
+		int size = parameters.size();
+		parameters.put(size, new Parameter(inputOuputType, dataType));
+		return size;
+	}
+	
+	public Parameter getParameter(int index){
+		if(parameters.size()>=index){
+			return parameters.get(index);
+		}else{
+			return null;
+		}
+		 
 	}
 	
 }

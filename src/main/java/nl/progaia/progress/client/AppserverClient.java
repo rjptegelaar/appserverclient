@@ -15,10 +15,12 @@ package nl.progaia.progress.client;
 
 
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import nl.progaia.progress.exception.AppserverClientException;
+import nl.progaia.progress.valueholder.ValueHolder;
 
 import com.progress.open4gl.javaproxy.Connection;
 import com.progress.open4gl.javaproxy.OpenAppObject;
@@ -53,6 +55,7 @@ public class AppserverClient {
 		try {
 			connect();
 			if(openAppObject!=null){
+				logger.info("Calling procedure: " + procedure.getName());
 				openAppObject.runProc(procedure.getName(), paramArray);	
 				return paramArray;
 			}else{
@@ -69,6 +72,11 @@ public class AppserverClient {
 					e.printStackTrace();
 			} 
 		}
+	}
+	
+	public Map<Integer, ValueHolder<?>> callProcedure(Map<Integer, ValueHolder<?>> values, Procedure procedure) throws AppserverClientException{
+		ParamArray paramArray = Mapper.from(procedure, values);
+		return Mapper.from(procedure,callProcedure(paramArray, procedure));
 	}
 	
 	private void connect() throws AppserverClientException{
