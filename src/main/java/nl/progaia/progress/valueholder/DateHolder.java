@@ -21,6 +21,8 @@ public class DateHolder extends AbstractValueHolder<GregorianCalendar>{
 		super(value);
 	}
 
-
+	public DateHolder() {
+		super();
+	}
 
 }

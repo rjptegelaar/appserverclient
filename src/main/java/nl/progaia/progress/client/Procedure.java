@@ -16,6 +16,7 @@ package nl.progaia.progress.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Procedure {
 	private Map<Integer, Parameter> parameters;
@@ -61,5 +62,20 @@ public class Procedure {
 		}
 		 
 	}
+
+	@Override
+	public String toString() {
+		StringBuffer procedureStructure = new StringBuffer();
+		procedureStructure.append("Name: ").append(name).append("\n");
+		Set<Integer> keys = parameters.keySet();
+		for (Integer index : keys) {			
+			procedureStructure.append("Param index: ").append(index);
+			procedureStructure.append(", Param datatype: ").append(parameters.get(index).toString());
+			procedureStructure.append("\n");
+		}				
+		return procedureStructure.toString();
+	}
+	
+	
 	
 }

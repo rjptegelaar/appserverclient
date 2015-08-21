@@ -48,5 +48,13 @@ public class Parameter {
 	public void setExtent(int extent) {
 		this.extent = extent;
 	}
+
+	@Override
+	public String toString() {
+		return "Parameter [inputOuputType=" + inputOuputType + ", dataType="
+				+ dataType + ", extent=" + extent + "]";
+	}
+	
+	
 	
 }

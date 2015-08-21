@@ -14,6 +14,7 @@
 package nl.progaia.progress.client;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import nl.progaia.progress.exception.AppserverClientException;
+import nl.progaia.progress.valueholder.BooleanHolder;
 import nl.progaia.progress.valueholder.DateHolder;
 import nl.progaia.progress.valueholder.DecimalHolder;
 import nl.progaia.progress.valueholder.IntegerHolder;
@@ -47,6 +49,7 @@ public final class Mapper {
 				if(paramMap.get(index).getInputOuputType()==ParameterModeType.INPUT_OUTPUT || paramMap.get(index).getInputOuputType()==ParameterModeType.OUTPUT)
 					valueMap.put(index, getValueHolder(paramMap.get(index).getDataType(), paramArray.getOutputParameter(index)));	
 			}		
+			print(valueMap);
 			return valueMap;
 		} catch (Open4GLException e) {
 			throw new AppserverClientException(e);
@@ -54,7 +57,8 @@ public final class Mapper {
 	}
 	
 	public static ParamArray from(Procedure procedure, Map<Integer, ValueHolder<?>> values) throws AppserverClientException{
-		try {
+		try {		
+			print(values);
 			ParamArray paramArray = new ParamArray(procedure.size());
 			Map<Integer, Parameter> paramMap = procedure.getParameters();
 			Set<Integer> paramIndexSet = paramMap.keySet();
@@ -91,12 +95,10 @@ public final class Mapper {
 								break;
 							case STRING:																																
 									paramArray.addCharacter(index, (String)values.get(index).getValue(), from(paramMap.get(index).getInputOuputType()));								
-								break;
+								break;							
 							default:
 								throw new AppserverClientException("Unsupported parameter type: " + paramMap.get(index).getDataType().name());						
 						}
-					}else{
-						paramArray.addCharacter(index, null, from(paramMap.get(index).getInputOuputType()));
 					}
 				}
 
@@ -116,7 +118,12 @@ public final class Mapper {
 		
 		switch(type){
 					case STRING:
+						if(value instanceof Character){							 
+							 return new StringHolder(String.valueOf((Character)value));
+						}else if(value instanceof String){
 							return new StringHolder((String)value);
+						}
+						return new StringHolder();	
 					case BLOB:															
 						if(value!=null){
 							if(value instanceof Memptr){					
@@ -125,16 +132,16 @@ public final class Mapper {
 								throw new AppserverClientException("Cannot convert value to Memptr.");
 							}
 						}
-						return null;
+						return new MemptrHolder();
 					case BOOLEAN:
 						if(value!=null){
-							if(value instanceof String){	
-								return new StringHolder((String) value);	
+								if(value instanceof Boolean){	
+									return new BooleanHolder((Boolean) value);									
+								}else{
+									throw new AppserverClientException("Cannot convert value to Boolean.");
+								}
 							}
-							}else{
-								throw new AppserverClientException("Cannot convert value to Boolean.");
-							}
-						return null;
+						return  new BooleanHolder();
 					case CLOB:
 						if(value!=null){
 							if(value instanceof String){			
@@ -143,16 +150,24 @@ public final class Mapper {
 								throw new AppserverClientException("Cannot convert value to String.");
 							}
 						}
-						return null;
+						return new StringHolder();
 					case DATE:
 						if(value!=null){
 							if(value instanceof GregorianCalendar){				
 								return new DateHolder((GregorianCalendar) value);
+							}else if(value instanceof Date){				
+								GregorianCalendar calendar = new GregorianCalendar ();
+								calendar.setTime(((Date) value));
+								return new DateHolder(calendar);
+							}else if(value instanceof Long){				
+								GregorianCalendar calendar = new GregorianCalendar ();
+								calendar.setTime((new Date((Long)value)));
+								return new DateHolder(calendar);
 							}else{
 								throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
 							}							
 						}
-						return null;												
+						return new DateHolder();												
 					case DATETIME:
 						if(value!=null){
 							if(value instanceof GregorianCalendar){				
@@ -161,7 +176,7 @@ public final class Mapper {
 								throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
 							}							
 						}
-						return null;																	
+						return new DateHolder();																	
 					case DATETIMETZ:
 						if(value!=null){
 							if(value instanceof GregorianCalendar){				
@@ -170,16 +185,20 @@ public final class Mapper {
 								throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
 							}							
 						}
-						return null;																							
+						return new DateHolder();																							
 					case DECIMAL:
 						if(value!=null){
 							if(value instanceof BigDecimal){		
 								return new DecimalHolder((BigDecimal) value);
+							}if(value instanceof Double){
+								return new DecimalHolder((BigDecimal) BigDecimal.valueOf((Double)value));
+							}if(value instanceof Float){
+								return new DecimalHolder((BigDecimal) BigDecimal.valueOf((Float)value));
 							}else{
 								throw new AppserverClientException("Cannot convert value to BigDecimal.");
 							}
 						}
-						return null;	
+						return new DecimalHolder();	
 					case INT:
 						if(value!=null){
 							if(value instanceof Integer){		
@@ -188,7 +207,7 @@ public final class Mapper {
 								throw new AppserverClientException("Cannot convert value to Integer.");
 							}
 						}
-						return null;							
+						return  new IntegerHolder();							
 					case LONG:
 						if(value!=null){
 							if(value instanceof Long){		
@@ -197,7 +216,7 @@ public final class Mapper {
 								throw new AppserverClientException("Cannot convert value to Long.");
 							}
 						}
-						return null;
+						return new LongHolder();
 
 					default:
 						logger.warning("No mapping for: " + type);
@@ -241,4 +260,13 @@ public final class Mapper {
 
 	}
 	
+	public static void print(Map<Integer, ValueHolder<?>> values){
+		StringBuffer valueHolderSet = new StringBuffer();
+		Set<Integer> keys = values.keySet();
+		for (Integer index : keys) {
+			valueHolderSet.append("Index: ").append(index).append(", Value: ").append(values.get(index).toString()).append("\n");
+		}
+		logger.info(valueHolderSet.toString());
+	} 
+			
 }

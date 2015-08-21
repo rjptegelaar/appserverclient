@@ -20,5 +20,9 @@ public class DecimalHolder extends AbstractValueHolder<BigDecimal>{
 	public DecimalHolder(BigDecimal value) {
 		super(value);
 	}
-
+		
+	public DecimalHolder() {
+		super();
+	}
+	
 }

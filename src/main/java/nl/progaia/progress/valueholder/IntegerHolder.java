@@ -19,4 +19,8 @@ public class IntegerHolder extends AbstractValueHolder<Integer>{
 		super(value);
 	}
 
+	
+	public IntegerHolder() {
+		super();
+	}
 }

@@ -56,6 +56,9 @@ public class AppserverClient {
 			connect();
 			if(openAppObject!=null){
 				logger.info("Calling procedure: " + procedure.getName());
+				if(logger.isLoggable(Level.FINE)){
+					logger.fine(procedure.toString());
+				}
 				openAppObject.runProc(procedure.getName(), paramArray);	
 				return paramArray;
 			}else{
@@ -74,7 +77,7 @@ public class AppserverClient {
 		}
 	}
 	
-	public Map<Integer, ValueHolder<?>> callProcedure(Map<Integer, ValueHolder<?>> values, Procedure procedure) throws AppserverClientException{
+	public Map<Integer, ValueHolder<?>> callProcedure(Map<Integer, ValueHolder<?>> values, Procedure procedure) throws AppserverClientException{		
 		ParamArray paramArray = Mapper.from(procedure, values);
 		return Mapper.from(procedure,callProcedure(paramArray, procedure));
 	}

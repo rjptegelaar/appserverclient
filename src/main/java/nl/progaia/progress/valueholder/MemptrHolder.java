@@ -17,6 +17,10 @@ import com.progress.open4gl.Memptr;
 
 public class MemptrHolder extends AbstractValueHolder<Memptr>{
 
+	public MemptrHolder() {
+		super();
+	}
+	
 	public MemptrHolder(Memptr value) {
 		super(value);
 	}

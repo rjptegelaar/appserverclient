@@ -18,5 +18,9 @@ public class LongHolder extends AbstractValueHolder<Long>{
 	public LongHolder(Long value) {
 		super(value);
 	}
+	
+	public LongHolder() {
+		super();
+	}
 
 }

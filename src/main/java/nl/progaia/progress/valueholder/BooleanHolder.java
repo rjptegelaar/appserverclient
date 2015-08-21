@@ -20,4 +20,8 @@ public class BooleanHolder extends AbstractValueHolder<Boolean>{
 		super(value);		
 	}
 
+	public BooleanHolder() {
+		super();		
+	}
+	
 }

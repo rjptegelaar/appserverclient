@@ -21,4 +21,8 @@ public class ProDataGraphHolder extends AbstractValueHolder<ProDataGraph>{
 		super(value);
 	}
 
+	
+	public ProDataGraphHolder() {
+		super();
+	}
 }

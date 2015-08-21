@@ -131,7 +131,7 @@ if (metadatas != null && metadatas.size() > 0) {
 					%>
 						Date tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%> = <%=inRowName%>.<%=column.getLabel()%>;
 						if(tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%>!=null){
-							tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",String.valueOf(tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%>.getTime()),"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");														
+							tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",tempDate_<%=cid%>_<%=inRowName%>_<%=column.getLabel()%>.getTime(),"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");														
 						}else{
 							tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",null,"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");
 						}					
@@ -142,7 +142,7 @@ if (metadatas != null && metadatas.size() > 0) {
 					<%
 					}else{
 					%>
-						tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",String.valueOf(<%=inRowName%>.<%=column.getLabel()%>),"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");					
+						tr_<%=cid %>.addColumn(new nl.progaia.progress.talend.utils.TalendColumn("<%=label %>",<%=inRowName%>.<%=column.getLabel()%>,"<%=typeToGenerate %>",<%=pattern %>,String.valueOf(<%=precision %>),String.valueOf(<%=length %>)), "<%=label %>");					
 					<%
 					}
 					
@@ -151,11 +151,9 @@ if (metadatas != null && metadatas.size() > 0) {
 			}
 		}
 %>
-		System.out.println(tr_<%=cid %>.toString());
-		System.out.println(proc_<%=cid %>.toString());
 		java.util.Map<Integer, nl.progaia.progress.valueholder.ValueHolder<?>> procedureResult_<%=cid %> = ac_<%=cid %>.callProcedure(proc_<%=cid %>.getValues(tr_<%=cid %>),proc_<%=cid %>.getProcedure());
 		proc_<%=cid %>.appendProcedureResult(procedureResult_<%=cid %>,tr_<%=cid %>);
-		
+		System.out.println(proc_<%=cid %>.toString());			
 <%		
 		List<? extends IConnection> outConnections = node.getOutgoingConnections();
 		IConnection firstOutConnection = null;
@@ -179,25 +177,114 @@ if (metadatas != null && metadatas.size() > 0) {
 				
 				for (IMetadataColumn outColumn : outColumnList) {
 					String label = outColumn.getLabel();
-					String outTypeToGenerate = JavaTypesManager.getTypeToGenerate(outColumn.getTalendType(), outColumn.isNullable());
+					
+					JavaType javaType = JavaTypesManager.getJavaTypeFromId(outColumn.getTalendType());
+%>					
+					nl.progaia.progress.talend.utils.TalendColumn column_<%=cid %>_<%=label %> = tr_<%=cid %>.getColumnByName("<%=label %>");														
+<%
+					if(javaType == JavaTypesManager.DATE){				
 %>
-					System.out.println("<%=label %>");
-					System.out.println("<%=outTypeToGenerate %>");
-					System.out.println(tr_<%=cid %>.getColumnByName("<%=label %>").toString());	
-<%				
-				
+						if(column_<%=cid %>_<%=label %>!=null){
+							if(column_<%=cid %>_<%=label %>.getValue()!=null){	
+								Date dateValue = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof Long){
+									dateValue = new Date((Long)column_<%=cid %>_<%=label %>.getValue());
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof Date){
+									dateValue = (Date)column_<%=cid %>_<%=label %>.getValue();
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof java.util.GregorianCalendar ){
+									dateValue =((java.util.GregorianCalendar)column_<%=cid %>_<%=label %>.getValue()).getTime();
+								}																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = dateValue;																							
+							}						
+						}	
+<%
+					}else if(javaType == JavaTypesManager.BYTE_ARRAY){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){ 
+														
+						}						
+<%
+					}else if(javaType == JavaTypesManager.CHARACTER){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							if(column_<%=cid %>_<%=label %>.getValue()!=null){	
+								Character characterValue = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof String){
+									String string = (String)column_<%=cid %>_<%=label %>.getValue();
+									characterValue = string.charAt(0);
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof Character){
+									characterValue = (Character)column_<%=cid %>_<%=label %>.getValue();
+								}																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = characterValue;																							
+							}						
+						}					
+<%															
+					}else if(javaType == JavaTypesManager.STRING){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (String)column_<%=cid %>_<%=label %>.getValue();					
+						}					
+<%
+					}else if(javaType == JavaTypesManager.INTEGER){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (Integer)column_<%=cid %>_<%=label %>.getValue();					
+						}					
+<%										
+					}else if(javaType == JavaTypesManager.DOUBLE){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							if(column_<%=cid %>_<%=label %>.getValue()!=null){	
+								Double doubleValue = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof BigDecimal){
+									BigDecimal bd = (BigDecimal)column_<%=cid %>_<%=label %>.getValue();
+									doubleValue = bd.doubleValue();
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof Double){
+									doubleValue = (Double)column_<%=cid %>_<%=label %>.getValue();
+								}
+																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = doubleValue;
+																								
+							}							  				
+						}					
+<%														
+					}else if(javaType == JavaTypesManager.FLOAT){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							if(column_<%=cid %>_<%=label %>.getValue()!=null){	
+								Float floatValue = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof BigDecimal){
+									BigDecimal bd = (BigDecimal)column_<%=cid %>_<%=label %>.getValue();
+									floatValue = bd.floatValue();
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof Float){
+									floatValue = (Float)column_<%=cid %>_<%=label %>.getValue();
+								}
+																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = floatValue;
+																								
+							}							  				
+						}			
+<%					
+					}else if(javaType == JavaTypesManager.BOOLEAN){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (Boolean)column_<%=cid %>_<%=label %>.getValue();					
+						}					
+<%															
+					}else{
+						if(javaType.getNullableClass().equals(java.math.BigDecimal.class)){
+%>						
+							<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (BigDecimal)column_<%=cid %>_<%=label %>.getValue();
+<%
+						}
+					}		
 				}
 			}
-		}
-		
-		
+		}				
 %>		
 		
-<%		
-		
+<%				
 	}
-
-
 %>
 
 
