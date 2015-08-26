@@ -37,7 +37,7 @@ public class TestAppserverClient {
 	private AppserverClient ac;
 	private Procedure procedure;
 	
-	@Before
+	
 	public void init() {
 		logger.info("Start init.");
 		ac = new AppserverClient("AppServer://localhost:5162/esbbroker1", "user1", "", "esbbroker1", "", 1);
@@ -48,7 +48,7 @@ public class TestAppserverClient {
 		ParameterType.valueOf("test");
 	}
 
-	@Test
+	
 	public void testCall() throws AppserverClientException{
 		ValueHolder<String> inputHolder = new StringHolder("toch?");
 		ValueHolder<String> outputHolder = new StringHolder();
