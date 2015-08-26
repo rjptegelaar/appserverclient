@@ -227,7 +227,20 @@ if (metadatas != null && metadatas.size() > 0) {
 					}else if(javaType == JavaTypesManager.BYTE){
 %>
 						if(column_<%=cid %>_<%=label %>!=null){ 
-														
+								Byte byteValue = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof Byte){
+									byteValue = (Byte)column_<%=cid %>_<%=label %>.getValue();
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof Integer){
+									Integer tempInt = (Integer)column_<%=cid %>_<%=label %>.getValue(); 
+									if(tempInt<=Byte.MAX_VALUE){
+										byteValue = tempInt.byteValue();
+									}else{
+										System.out.println("Integer too large to convert to byte.");	
+									}
+									 
+								}
+																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = byteValue;										
 						}						
 <%
 					}else if(javaType == JavaTypesManager.CHARACTER){
