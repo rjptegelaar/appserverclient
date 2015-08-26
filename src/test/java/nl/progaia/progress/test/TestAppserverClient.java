@@ -40,7 +40,8 @@ public class TestAppserverClient {
 	
 	public void init() {
 		logger.info("Start init.");
-		ac = new AppserverClient("AppServer://localhost:5162/esbbroker1", "user1", "", "esbbroker1", "", 1);
+		ac = AppserverClient.getInstance();
+		ac.init("AppServer://localhost:5162/esbbroker1", "user1", "", "esbbroker1", "", 1);
 		procedure = new Procedure("test.p");
 		procedure.addParameter(ParameterModeType.INPUT, ParameterType.STRING);
 		procedure.addParameter(ParameterModeType.OUTPUT, ParameterType.STRING);

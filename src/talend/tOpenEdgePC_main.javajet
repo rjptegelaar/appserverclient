@@ -198,7 +198,33 @@ if (metadatas != null && metadatas.size() > 0) {
 							}						
 						}	
 <%
+					}else if(javaType == JavaTypesManager.STRING){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (String)column_<%=cid %>_<%=label %>.getValue();					
+						}					
+<%
+					}else if(javaType == JavaTypesManager.LONG){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (Long)column_<%=cid %>_<%=label %>.getValue();					
+						}					
+<%
 					}else if(javaType == JavaTypesManager.BYTE_ARRAY){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							if(column_<%=cid %>_<%=label %>.getValue()!=null){	
+								byte[] byteArray = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof byte[]){
+									byteArray = (byte[])column_<%=cid %>_<%=label %>.getValue();
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof com.progress.open4gl.Memptr){
+									byteArray = ((com.progress.open4gl.Memptr)column_<%=cid %>_<%=label %>.getValue()).getBytes();
+								}																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = byteArray;																							
+							}						
+						}						
+<%
+					}else if(javaType == JavaTypesManager.BYTE){
 %>
 						if(column_<%=cid %>_<%=label %>!=null){ 
 														
@@ -219,16 +245,29 @@ if (metadatas != null && metadatas.size() > 0) {
 							}						
 						}					
 <%															
-					}else if(javaType == JavaTypesManager.STRING){
-%>
-						if(column_<%=cid %>_<%=label %>!=null){
-							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (String)column_<%=cid %>_<%=label %>.getValue();					
-						}					
-<%
 					}else if(javaType == JavaTypesManager.INTEGER){
 %>
 						if(column_<%=cid %>_<%=label %>!=null){
 							  <%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (Integer)column_<%=cid %>_<%=label %>.getValue();					
+						}					
+<%										
+					}else if(javaType == JavaTypesManager.SHORT){
+%>
+						if(column_<%=cid %>_<%=label %>!=null){
+							  	Short shortValue = null;
+								if(column_<%=cid %>_<%=label %>.getValue() instanceof Short){
+									shortValue = (Short)column_<%=cid %>_<%=label %>.getValue();
+								}else if(column_<%=cid %>_<%=label %>.getValue() instanceof Integer){
+									Integer tempInt = (Integer)column_<%=cid %>_<%=label %>.getValue(); 
+									if(tempInt<=Short.MAX_VALUE){
+										shortValue = tempInt.shortValue();
+									}else{
+										System.out.println("Integer too large to convert to short.");	
+									}
+									 
+								}
+																																										
+								<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = shortValue;					
 						}					
 <%										
 					}else if(javaType == JavaTypesManager.DOUBLE){
@@ -276,6 +315,10 @@ if (metadatas != null && metadatas.size() > 0) {
 %>						
 							<%=firstOutConnection.getName() %>.<%=outColumn.getLabel() %> = (BigDecimal)column_<%=cid %>_<%=label %>.getValue();
 <%
+						}else{
+%>
+							System.out.println("Cannot map: " + "<%=javaType %>");	
+<%						
 						}
 					}		
 				}

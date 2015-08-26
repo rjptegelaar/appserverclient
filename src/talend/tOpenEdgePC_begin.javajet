@@ -30,7 +30,8 @@
     
 %>
 
-nl.progaia.progress.client.AppserverClient ac_<%=cid %> = new nl.progaia.progress.client.AppserverClient(<%=appserverUrl%>, <%=username%>, <%=password%>, <%=service%>, <%=appServerInfo%>, <%=session%>);
+nl.progaia.progress.client.AppserverClient ac_<%=cid %> = nl.progaia.progress.client.AppserverClient.getInstance();
+ac_<%=cid %>.init(<%=appserverUrl%>, <%=username%>, <%=password%>, <%=service%>, <%=appServerInfo%>, <%=session%>);
 
 
 

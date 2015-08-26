@@ -13,6 +13,7 @@
 //limitations under the License.
 package nl.progaia.progress.client;
 
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -118,15 +119,19 @@ public final class Mapper {
 		
 		switch(type){
 					case STRING:
-						if(value instanceof Character){							 
-							 return new StringHolder(String.valueOf((Character)value));
-						}else if(value instanceof String){
-							return new StringHolder((String)value);
+						if(value!=null){
+							if(value instanceof Character){							 
+								 return new StringHolder(String.valueOf((Character)value));
+							}else if(value instanceof String){
+								return new StringHolder((String)value);
+							}
 						}
 						return new StringHolder();	
 					case BLOB:															
 						if(value!=null){
-							if(value instanceof Memptr){					
+							if(value instanceof byte[]){				
+								return new MemptrHolder(new Memptr((byte[])value));
+							}else if(value instanceof Memptr){					
 								return new MemptrHolder((Memptr)value);							
 							}else{
 								throw new AppserverClientException("Cannot convert value to Memptr.");
@@ -153,37 +158,17 @@ public final class Mapper {
 						return new StringHolder();
 					case DATE:
 						if(value!=null){
-							if(value instanceof GregorianCalendar){				
-								return new DateHolder((GregorianCalendar) value);
-							}else if(value instanceof Date){				
-								GregorianCalendar calendar = new GregorianCalendar ();
-								calendar.setTime(((Date) value));
-								return new DateHolder(calendar);
-							}else if(value instanceof Long){				
-								GregorianCalendar calendar = new GregorianCalendar ();
-								calendar.setTime((new Date((Long)value)));
-								return new DateHolder(calendar);
-							}else{
-								throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
-							}							
+							return resolveDate(value);							
 						}
 						return new DateHolder();												
 					case DATETIME:
 						if(value!=null){
-							if(value instanceof GregorianCalendar){				
-								return new DateHolder((GregorianCalendar) value);
-							}else{
-								throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
-							}							
+							return resolveDate(value);							
 						}
 						return new DateHolder();																	
 					case DATETIMETZ:
 						if(value!=null){
-							if(value instanceof GregorianCalendar){				
-								return new DateHolder((GregorianCalendar) value);
-							}else{
-								throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
-							}							
+							return resolveDate(value);							
 						}
 						return new DateHolder();																							
 					case DECIMAL:
@@ -203,6 +188,12 @@ public final class Mapper {
 						if(value!=null){
 							if(value instanceof Integer){		
 								return new IntegerHolder((Integer)value);
+							}else if(value instanceof Short){		
+								int shortTemp = ((Short)value).intValue();
+								return new IntegerHolder(shortTemp);
+							}else if(value instanceof Byte){		
+								int byteTemp = ((Byte)value).intValue();
+								return new IntegerHolder(byteTemp);
 							}else{
 								throw new AppserverClientException("Cannot convert value to Integer.");
 							}
@@ -222,6 +213,23 @@ public final class Mapper {
 						logger.warning("No mapping for: " + type);
 						return null;											
 					}
+	}
+
+	private static ValueHolder<?> resolveDate(Object value)
+			throws AppserverClientException {
+		if(value instanceof GregorianCalendar){				
+			return new DateHolder((GregorianCalendar) value);
+		}else if(value instanceof Date){				
+			GregorianCalendar calendar = new GregorianCalendar ();
+			calendar.setTime(((Date) value));
+			return new DateHolder(calendar);
+		}else if(value instanceof Long){				
+			GregorianCalendar calendar = new GregorianCalendar ();
+			calendar.setTime((new Date((Long)value)));
+			return new DateHolder(calendar);
+		}else{
+			throw new AppserverClientException("Cannot convert value to GregorianCalendar.");
+		}
 	}
 	
 	public static int from(ParameterModeType type){

@@ -39,11 +39,22 @@ public class AppserverClient {
 	private Connection connection;
 	private OpenAppObject openAppObject;
 	
-	public AppserverClient(){
-		
-	}
+	   private static AppserverClient instance = null;
+	   
+	   private AppserverClient() {
+	      // Exists only to defeat instantiation.
+	   }
+	   
+	   public static AppserverClient getInstance() {
+	      if(instance == null) {
+	         instance = new AppserverClient();
+	      }
+	      return instance;
+	   }
 	
-	public AppserverClient(String appserverUrl, String username, String password, String appServerInfo, String service, int session){
+
+	
+	public synchronized void init(String appserverUrl, String username, String password, String appServerInfo, String service, int session){
 		this.appServerInfo = appServerInfo;
 		this.appserverUrl = appserverUrl;
 		this.username = username;
@@ -52,7 +63,7 @@ public class AppserverClient {
 		this.session = session;
 	}
 	
-	public ParamArray callProcedure(ParamArray paramArray, Procedure procedure) throws AppserverClientException{
+	public synchronized ParamArray callProcedure(ParamArray paramArray, Procedure procedure) throws AppserverClientException{
 		try {
 			connect();
 			if(openAppObject!=null){
@@ -78,12 +89,12 @@ public class AppserverClient {
 		}
 	}
 	
-	public Map<Integer, ValueHolder<?>> callProcedure(Map<Integer, ValueHolder<?>> values, Procedure procedure) throws AppserverClientException{		
+	public synchronized Map<Integer, ValueHolder<?>> callProcedure(Map<Integer, ValueHolder<?>> values, Procedure procedure) throws AppserverClientException{		
 		ParamArray paramArray = Mapper.from(procedure, values);
 		return Mapper.from(procedure,callProcedure(paramArray, procedure));
 	}
 	
-	private void connect() throws AppserverClientException{
+	private synchronized void connect() throws AppserverClientException{
 		
 		try {
 			
@@ -98,7 +109,7 @@ public class AppserverClient {
 	}	
 	
 	
-	private void disconnect() throws AppserverClientException{
+	private synchronized void disconnect() throws AppserverClientException{
 		try {
 			logger.info("Disconnecting from appserver.");
 			if (openAppObject != null) {
