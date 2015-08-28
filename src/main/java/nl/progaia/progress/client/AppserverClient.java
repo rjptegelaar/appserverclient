@@ -1,5 +1,6 @@
 //Copyright 2014 Paul Tegelaar
 
+
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,6 +13,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 package nl.progaia.progress.client;
 
 
@@ -64,8 +66,11 @@ public class AppserverClient {
 	}
 	
 	public synchronized ParamArray callProcedure(ParamArray paramArray, Procedure procedure) throws AppserverClientException{
-		try {			
-			connect();
+		try {	
+			
+			if(openAppObject==null)
+				create();
+									
 			if(openAppObject!=null){
 				
 				if(logger.isLoggable(Level.FINE)){
@@ -79,14 +84,6 @@ public class AppserverClient {
 			}								
 		} catch (Exception e) {
 			throw new AppserverClientException(e);
-		}finally{
-			try {
-				disconnect();
-			} catch (Exception e) {
-				logger.warning(e.getMessage());
-				if(logger.isLoggable(Level.FINE))
-					e.printStackTrace();
-			} 
 		}
 	}
 	
@@ -95,7 +92,7 @@ public class AppserverClient {
 		return Mapper.from(procedure,callProcedure(paramArray, procedure));
 	}
 	
-	private synchronized void connect() throws AppserverClientException{
+	private void create() throws AppserverClientException{
 		
 		try {
 			if(logger.isLoggable(Level.FINE))
@@ -110,7 +107,7 @@ public class AppserverClient {
 	}	
 	
 	
-	private synchronized void disconnect() throws AppserverClientException{
+	private void destroy() throws AppserverClientException{
 		try {
 			if(logger.isLoggable(Level.FINE))
 				logger.fine("Disconnecting from appserver.");
@@ -128,5 +125,6 @@ public class AppserverClient {
 			throw new AppserverClientException(e);
 		}
 	}	
+		
 	
 }
