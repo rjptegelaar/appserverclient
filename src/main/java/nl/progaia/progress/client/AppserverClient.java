@@ -64,11 +64,12 @@ public class AppserverClient {
 	}
 	
 	public synchronized ParamArray callProcedure(ParamArray paramArray, Procedure procedure) throws AppserverClientException{
-		try {
+		try {			
 			connect();
 			if(openAppObject!=null){
-				logger.info("Calling procedure: " + procedure.getName());
+				
 				if(logger.isLoggable(Level.FINE)){
+					logger.fine("Calling procedure: " + procedure.getName());
 					logger.fine(procedure.toString());
 				}
 				openAppObject.runProc(procedure.getName(), paramArray);	
@@ -97,8 +98,8 @@ public class AppserverClient {
 	private synchronized void connect() throws AppserverClientException{
 		
 		try {
-			
-			logger.info("Connecting to appserver.");
+			if(logger.isLoggable(Level.FINE))
+				logger.fine("Connecting to appserver.");
 			connection = new Connection(appserverUrl, username, password, appServerInfo);
 			connection.setSessionModel(session);
 			openAppObject = new OpenAppObject(connection, service);
@@ -111,7 +112,8 @@ public class AppserverClient {
 	
 	private synchronized void disconnect() throws AppserverClientException{
 		try {
-			logger.info("Disconnecting from appserver.");
+			if(logger.isLoggable(Level.FINE))
+				logger.fine("Disconnecting from appserver.");
 			if (openAppObject != null) {
 				openAppObject._release();
 				openAppObject = null;

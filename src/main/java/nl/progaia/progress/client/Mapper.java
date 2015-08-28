@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import nl.progaia.progress.exception.AppserverClientException;
@@ -104,7 +105,7 @@ public final class Mapper {
 				}
 
 			}else{
-				logger.info("No values to map to valueholer.");
+				logger.warning("No values to map to valueholer.");
 			}
 		
 			
@@ -274,7 +275,9 @@ public final class Mapper {
 		for (Integer index : keys) {
 			valueHolderSet.append("Index: ").append(index).append(", Value: ").append(values.get(index).toString()).append("\n");
 		}
-		logger.info(valueHolderSet.toString());
+		if(logger.isLoggable(Level.FINE))
+			logger.fine(valueHolderSet.toString());
 	} 
+	
 			
 }

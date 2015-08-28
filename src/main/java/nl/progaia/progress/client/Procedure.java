@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import nl.progaia.progress.exception.AppserverClientException;
+
 public class Procedure {
 	private Map<Integer, Parameter> parameters;
 	private String name;
@@ -76,6 +78,34 @@ public class Procedure {
 		return procedureStructure.toString();
 	}
 	
-	
+	public void check() throws AppserverClientException{
+		int in = 0;
+		int out = 0;
+		Set<Integer> keys = parameters.keySet();
+		for (Integer index : keys) {			
+			switch(parameters.get(index).getInputOuputType()){
+			case INPUT:
+				in = 1;
+				break;
+			case OUTPUT:
+				out = 1;
+				break;
+			case INPUT_OUTPUT:
+				in = 1;
+				out = 1;
+				break;			
+			}
+			
+			if(in==1 && out==1){
+				//No need to check further, everything OK
+				break;
+			}
+		}
+		
+		if(in!=1 || out!=1){
+			throw new AppserverClientException("Procedure must have at least one input and one output parameter or at least one input-output parameter");
+		}
+		
+	}
 	
 }
