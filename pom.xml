@@ -112,11 +112,10 @@
 			<activemq.version>5.7.0</activemq.version>
 		</properties>
 	
-		<distributionManagement>
+	<distributionManagement>
 		<repository>
-			<id>pte-releases</id>
-			<name>internal releases</name>
-			<url>${releases-url}</url>
+			<id>bintray</id>
+			<url>https://api.bintray.com/maven/paultegelaar/maven/appserverclient</url>
 		</repository>
 		<snapshotRepository>
 			<id>pte-snapshots</id>
